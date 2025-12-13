@@ -305,7 +305,8 @@
         }
 
         .item-icon {
-            font-size: 28px;
+            width: 32px;
+            height: 32px;
             transition: transform 0.3s ease;
         }
 
@@ -514,26 +515,26 @@
 
     <script>
         const items = [
-            { name: 'Surg-E', itemsPerPack: 5, icon: '⚕️', isSpecial: false },
-            { name: 'Surgical Stitches', itemsPerPack: 20, icon: '🧵', isSpecial: true },
-            { name: 'Surgical Antibiotics', itemsPerPack: 20, icon: '💊', isSpecial: false },
-            { name: 'Surgical Anesthetic', itemsPerPack: 20, icon: '💉', isSpecial: false },
-            { name: 'Surgical Scalpel', itemsPerPack: 20, icon: '🔪', isSpecial: false },
-            { name: 'Surgical Sponge', itemsPerPack: 20, icon: '🟨', isSpecial: false },
-            { name: 'Surgical Antiseptic', itemsPerPack: 20, icon: '🧴', isSpecial: false },
-            { name: 'Surgical Clamp', itemsPerPack: 20, icon: '🔧', isSpecial: false },
-            { name: 'Surgical Defibrillator', itemsPerPack: 20, icon: '💔', isSpecial: false },
-            { name: 'Surgical Lab Kit', itemsPerPack: 20, icon: '🧪', isSpecial: false },
-            { name: 'Surgical Pins', itemsPerPack: 20, icon: '📌', isSpecial: false },
-            { name: 'Surgical Splint', itemsPerPack: 20, icon: '🦴', isSpecial: false },
-            { name: 'Surgical Transfusion', itemsPerPack: 20, icon: '🩸', isSpecial: false },
-            { name: 'Surgical Ultrasound', itemsPerPack: 20, icon: '📡', isSpecial: false },
+            { name: 'Surg-E', itemsPerPack: 5, icon: 'Surg-E.webp', isSpecial: false },
+            { name: 'Surgical Anesthetic', itemsPerPack: 20, icon: 'Surgical Anesthetic.webp', isSpecial: false },
+            { name: 'Surgical Antibiotics', itemsPerPack: 20, icon: 'Surgical Antibiotics.webp', isSpecial: false },
+            { name: 'Surgical Antiseptic', itemsPerPack: 20, icon: 'Surgical Antiseptic.webp', isSpecial: false },
+            { name: 'Surgical Clamp', itemsPerPack: 20, icon: 'Surgical Clamp.webp', isSpecial: false },
+            { name: 'Surgical Defibrillator', itemsPerPack: 20, icon: 'Surgical Defibrillator.webp', isSpecial: false },
+            { name: 'Surgical Lab Kit', itemsPerPack: 20, icon: 'Surgical Lab Kit.webp', isSpecial: false },
+            { name: 'Surgical Pins', itemsPerPack: 20, icon: 'Surgical Pins.webp', isSpecial: false },
+            { name: 'Surgical Scalpel', itemsPerPack: 20, icon: 'Surgical Scalpel.webp', isSpecial: false },
+            { name: 'Surgical Splint', itemsPerPack: 20, icon: 'Surgical Splint.webp', isSpecial: false },
+            { name: 'Surgical Stitches', itemsPerPack: 20, icon: 'Surgical Stitches.webp', isSpecial: true },
+            { name: 'Surgical Sponge', itemsPerPack: 20, icon: 'Surgical Sponge.webp', isSpecial: false },
+            { name: 'Surgical Transfusion', itemsPerPack: 20, icon: 'Surgical Transfusion.webp', isSpecial: false },
+            { name: 'Surgical Ultrasound', itemsPerPack: 20, icon: 'Surgical Ultrasound.webp', isSpecial: false },
         ];
 
         const state = {
             prices: {},
             unitTypes: {},
-            stitchesPerWL: 0,
+            stitchesPrice: 0,
             stitchesUnit: 'per'
         };
 
@@ -553,13 +554,15 @@
                 const inputId = item.isSpecial ? 'stitches-input' : `price-${item.name}`;
                 const inputClass = item.isSpecial ? 'stitches-input' : 'price-input';
                 const currentUnit = item.isSpecial ? state.stitchesUnit : state.unitTypes[item.name];
+                const numPacks = parseFloat(document.getElementById('numPacks').value) || 1;
+                const totalItems = item.itemsPerPack * numPacks;
                 
                 div.innerHTML = `
                     <div class="item-header">
-                        <span class="item-icon">${item.icon}</span>
+                        <img src="${item.icon}" alt="${item.name}" class="item-icon">
                         <div class="item-info">
                             <h3>${item.name}</h3>
-                            <p>${item.itemsPerPack} total</p>
+                            <p id="total-${item.name}">${totalItems} total</p>
                         </div>
                     </div>
                     <label class="item-label">Price</label>
@@ -595,7 +598,7 @@
 
             document.querySelectorAll('.stitches-input').forEach(input => {
                 input.addEventListener('input', (e) => {
-                    state.stitchesPerWL = parseFloat(e.target.value) || 0;
+                    state.stitchesPrice = parseFloat(e.target.value) || 0;
                     updateCalculations();
                 });
             });
@@ -622,33 +625,52 @@
             const numPacks = parseFloat(document.getElementById('numPacks').value) || 1;
             const costPerPack = parseFloat(document.getElementById('costPerPack').value) || 0;
 
-            let totalRevenuePerPack = 0;
+            // Update total items display
+            items.forEach(item => {
+                const totalItems = item.itemsPerPack * numPacks;
+                const totalEl = document.getElementById(`total-${item.name}`);
+                if (totalEl) {
+                    totalEl.textContent = `${totalItems} total`;
+                }
+            });
+
+            let totalRevenue = 0;
 
             items.forEach(item => {
+                const totalItemsInPacks = item.itemsPerPack * numPacks;
+
                 if (item.isSpecial) {
+                    // Surgical Stitches
                     if (state.stitchesUnit === 'per') {
-                        const revenuePerPack = (item.itemsPerPack / 200) * state.stitchesPerWL;
-                        totalRevenuePerPack += revenuePerPack;
+                        // Per mode: price adalah WL per 200 stitches
+                        const revenue = (totalItemsInPacks / 200) * state.stitchesPrice;
+                        totalRevenue += revenue;
                     } else {
-                        const revenuePerPack = item.itemsPerPack * state.stitchesPerWL;
-                        totalRevenuePerPack += revenuePerPack;
+                        // Each mode: price adalah WL per 1 stitch (setara dengan per mode)
+                        // Untuk 1 each = 1 per WL, maka: 200 items / 200 = 1 WL, yang berarti 1 stitch = 0.005 WL
+                        // Tapi kita ingin 1 each = sama dengan 1 per WL
+                        // Jadi formula: revenue = price / 200 (untuk membuat 1 each setara 1 per)
+                        const revenue = (totalItemsInPacks * state.stitchesPrice) / 200;
+                        totalRevenue += revenue;
                     }
                 } else {
+                    // Normal items
                     const unit = state.unitTypes[item.name];
                     if (unit === 'per') {
+                        // Per mode: price adalah items per 1 WL
                         const itemsPerWL = state.prices[item.name];
                         if (itemsPerWL > 0) {
-                            const revenuePerPack = item.itemsPerPack / itemsPerWL;
-                            totalRevenuePerPack += revenuePerPack;
+                            const revenue = totalItemsInPacks / itemsPerWL;
+                            totalRevenue += revenue;
                         }
                     } else {
-                        const revenuePerPack = item.itemsPerPack * state.prices[item.name];
-                        totalRevenuePerPack += revenuePerPack;
+                        // Each mode: price adalah WL per setiap item
+                        const revenue = totalItemsInPacks * state.prices[item.name];
+                        totalRevenue += revenue;
                     }
                 }
             });
 
-            const totalRevenue = totalRevenuePerPack * numPacks;
             const totalCost = numPacks * costPerPack;
             const netProfit = totalRevenue - totalCost;
             const profitPercentage = totalCost > 0 ? (netProfit / totalCost) * 100 : 0;
@@ -668,7 +690,9 @@
             percentageBadge.textContent = `${profitPercentage >= 0 ? '+' : ''}${profitPercentage.toFixed(1)}%`;
         }
 
-        document.getElementById('numPacks').addEventListener('input', updateCalculations);
+        document.getElementById('numPacks').addEventListener('input', () => {
+            initializeItems();
+        });
         document.getElementById('costPerPack').addEventListener('input', updateCalculations);
 
         initializeItems();

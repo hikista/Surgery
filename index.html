@@ -434,7 +434,7 @@
     <div class="container">
         <div class="header">
             <div class="header-content">
-                <div class="header-icon-box">⚕️</div>
+                <div class="header-icon-box">🛡️</div>
                 <div class="header-text">
                     <div class="header-title-row">
                         <h1>Surgery Tools</h1>
@@ -515,27 +515,25 @@
 
     <script>
         const items = [
-            { name: 'Surg-E', itemsPerPack: 5, icon: 'Surg-E.webp', isSpecial: false },
-            { name: 'Surgical Anesthetic', itemsPerPack: 20, icon: 'Surgical Anesthetic.webp', isSpecial: false },
-            { name: 'Surgical Antibiotics', itemsPerPack: 20, icon: 'Surgical Antibiotics.webp', isSpecial: false },
-            { name: 'Surgical Antiseptic', itemsPerPack: 20, icon: 'Surgical Antiseptic.webp', isSpecial: false },
-            { name: 'Surgical Clamp', itemsPerPack: 20, icon: 'Surgical Clamp.webp', isSpecial: false },
-            { name: 'Surgical Defibrillator', itemsPerPack: 20, icon: 'Surgical Defibrillator.webp', isSpecial: false },
-            { name: 'Surgical Lab Kit', itemsPerPack: 20, icon: 'Surgical Lab Kit.webp', isSpecial: false },
-            { name: 'Surgical Pins', itemsPerPack: 20, icon: 'Surgical Pins.webp', isSpecial: false },
-            { name: 'Surgical Scalpel', itemsPerPack: 20, icon: 'Surgical Scalpel.webp', isSpecial: false },
-            { name: 'Surgical Splint', itemsPerPack: 20, icon: 'Surgical Splint.webp', isSpecial: false },
-            { name: 'Surgical Stitches', itemsPerPack: 20, icon: 'Surgical Stitches.webp', isSpecial: true },
-            { name: 'Surgical Sponge', itemsPerPack: 20, icon: 'Surgical Sponge.webp', isSpecial: false },
-            { name: 'Surgical Transfusion', itemsPerPack: 20, icon: 'Surgical Transfusion.webp', isSpecial: false },
-            { name: 'Surgical Ultrasound', itemsPerPack: 20, icon: 'Surgical Ultrasound.webp', isSpecial: false },
+            { name: 'Surg-E', itemsPerPack: 5, icon: 'Surg-E.webp' },
+            { name: 'Surgical Anesthetic', itemsPerPack: 20, icon: 'Surgical Anesthetic.webp' },
+            { name: 'Surgical Antibiotics', itemsPerPack: 20, icon: 'Surgical Antibiotics.webp' },
+            { name: 'Surgical Antiseptic', itemsPerPack: 20, icon: 'Surgical Antiseptic.webp' },
+            { name: 'Surgical Clamp', itemsPerPack: 20, icon: 'Surgical Clamp.webp' },
+            { name: 'Surgical Defibrillator', itemsPerPack: 20, icon: 'Surgical Defibrillator.webp' },
+            { name: 'Surgical Lab Kit', itemsPerPack: 20, icon: 'Surgical Lab Kit.webp' },
+            { name: 'Surgical Pins', itemsPerPack: 20, icon: 'Surgical Pins.webp' },
+            { name: 'Surgical Scalpel', itemsPerPack: 20, icon: 'Surgical Scalpel.webp' },
+            { name: 'Surgical Splint', itemsPerPack: 20, icon: 'Surgical Splint.webp' },
+            { name: 'Surgical Stitches', itemsPerPack: 20, icon: 'Surgical Stitches.webp' },
+            { name: 'Surgical Sponge', itemsPerPack: 20, icon: 'Surgical Sponge.webp' },
+            { name: 'Surgical Transfusion', itemsPerPack: 20, icon: 'Surgical Transfusion.webp' },
+            { name: 'Surgical Ultrasound', itemsPerPack: 20, icon: 'Surgical Ultrasound.webp' },
         ];
 
         const state = {
             prices: {},
-            unitTypes: {},
-            stitchesPrice: 0,
-            stitchesUnit: 'per'
+            unitTypes: {}
         };
 
         items.forEach(item => {
@@ -551,11 +549,9 @@
                 const div = document.createElement('div');
                 div.className = 'item-card';
                 
-                const inputId = item.isSpecial ? 'stitches-input' : `price-${item.name}`;
-                const inputClass = item.isSpecial ? 'stitches-input' : 'price-input';
-                const currentUnit = item.isSpecial ? state.stitchesUnit : state.unitTypes[item.name];
                 const numPacks = parseFloat(document.getElementById('numPacks').value) || 1;
                 const totalItems = item.itemsPerPack * numPacks;
+                const currentUnit = state.unitTypes[item.name];
                 
                 div.innerHTML = `
                     <div class="item-header">
@@ -569,8 +565,7 @@
                     <div class="item-input-wrapper">
                         <input 
                             type="number" 
-                            id="${inputId}" 
-                            class="${inputClass}" 
+                            class="price-input" 
                             data-item="${item.name}" 
                             min="0" 
                             value="0" 
@@ -596,24 +591,12 @@
                 });
             });
 
-            document.querySelectorAll('.stitches-input').forEach(input => {
-                input.addEventListener('input', (e) => {
-                    state.stitchesPrice = parseFloat(e.target.value) || 0;
-                    updateCalculations();
-                });
-            });
-
             document.querySelectorAll('.unit-text').forEach(span => {
                 span.addEventListener('click', (e) => {
                     const itemName = e.target.closest('.unit-text').dataset.item;
+                    state.unitTypes[itemName] = state.unitTypes[itemName] === 'per' ? 'each' : 'per';
                     
-                    if (itemName === 'Surgical Stitches') {
-                        state.stitchesUnit = state.stitchesUnit === 'per' ? 'each' : 'per';
-                    } else {
-                        state.unitTypes[itemName] = state.unitTypes[itemName] === 'per' ? 'each' : 'per';
-                    }
-                    
-                    const newUnit = itemName === 'Surgical Stitches' ? state.stitchesUnit : state.unitTypes[itemName];
+                    const newUnit = state.unitTypes[itemName];
                     e.target.closest('.unit-text').innerHTML = `${newUnit} <span class="unit-arrow">▼</span>`;
                     
                     updateCalculations();
@@ -638,36 +621,19 @@
 
             items.forEach(item => {
                 const totalItemsInPacks = item.itemsPerPack * numPacks;
+                const unit = state.unitTypes[item.name];
+                const price = state.prices[item.name];
 
-                if (item.isSpecial) {
-                    // Surgical Stitches
-                    if (state.stitchesUnit === 'per') {
-                        // Per mode: price adalah WL per 200 stitches
-                        const revenue = (totalItemsInPacks / 200) * state.stitchesPrice;
-                        totalRevenue += revenue;
-                    } else {
-                        // Each mode: price adalah WL per 1 stitch (setara dengan per mode)
-                        // Untuk 1 each = 1 per WL, maka: 200 items / 200 = 1 WL, yang berarti 1 stitch = 0.005 WL
-                        // Tapi kita ingin 1 each = sama dengan 1 per WL
-                        // Jadi formula: revenue = price / 200 (untuk membuat 1 each setara 1 per)
-                        const revenue = (totalItemsInPacks * state.stitchesPrice) / 200;
+                if (unit === 'per') {
+                    // Per mode: price adalah items per 1 WL
+                    if (price > 0) {
+                        const revenue = totalItemsInPacks / price;
                         totalRevenue += revenue;
                     }
                 } else {
-                    // Normal items
-                    const unit = state.unitTypes[item.name];
-                    if (unit === 'per') {
-                        // Per mode: price adalah items per 1 WL
-                        const itemsPerWL = state.prices[item.name];
-                        if (itemsPerWL > 0) {
-                            const revenue = totalItemsInPacks / itemsPerWL;
-                            totalRevenue += revenue;
-                        }
-                    } else {
-                        // Each mode: price adalah WL per setiap item
-                        const revenue = totalItemsInPacks * state.prices[item.name];
-                        totalRevenue += revenue;
-                    }
+                    // Each mode: price adalah WL per setiap item
+                    const revenue = totalItemsInPacks * price;
+                    totalRevenue += revenue;
                 }
             });
 
@@ -700,4 +666,3 @@
     </script>
 </body>
 </html>
-

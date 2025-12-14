@@ -536,3 +536,34 @@ input[type="number"] {
         flex-wrap: wrap;
     }
 }
+
+.watermark {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fbbf24;
+    pointer-events: none;
+    z-index: 50;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, rgba(217, 119, 6, 0.2) 0%, rgba(217, 119, 6, 0.1) 100%);
+    border: 1px solid rgba(217, 119, 6, 0.4);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(217, 119, 6, 0.2);
+    animation: watermarkGlow 3s ease-in-out infinite;
+}
+
+@keyframes watermarkGlow {
+    0%, 100% {
+        box-shadow: 0 8px 32px rgba(217, 119, 6, 0.2);
+        border-color: rgba(217, 119, 6, 0.4);
+    }
+    50% {
+        box-shadow: 0 8px 32px rgba(217, 119, 6, 0.4);
+        border-color: rgba(217, 119, 6, 0.6);
+    }
+}

@@ -192,10 +192,41 @@ function initializeDoctor() {
 }
 
 document.getElementById('numSurgeries').addEventListener('input', (e) => {
-    let val = parseInt(e.target.value) || 0;
-    if (val < 1) e.target.value = 1;
-    if (val > 10000) e.target.value = 10000;
-    if (val >= 1 && val <= 10000) initializeDoctor();
+    let val = e.target.value;
+    
+    // Jika kosong, reset ke 0
+    if (val === '') {
+        document.getElementById('totalSurgeries').textContent = '0';
+        document.getElementById('totalToolsNeeded').textContent = '0';
+        
+        // Reset semua required menjadi 0
+        const container = document.getElementById('doctorContainer');
+        container.innerHTML = '';
+        doctorTools.forEach(tool => {
+            const div = document.createElement('div');
+            div.className = 'doctor-card';
+            div.innerHTML = `
+                <img src="${tool.icon}" alt="${tool.name}" style="width: 32px; height: 32px; margin-bottom: 8px; object-fit: contain;">
+                <div class="doctor-card-title">${tool.name}</div>
+                <div class="doctor-card-required"><strong>0</strong></div>
+            `;
+            container.appendChild(div);
+        });
+        return;
+    }
+    
+    let numVal = parseInt(val) || 0;
+    
+    // Validasi range
+    if (numVal < 1) numVal = 1;
+    if (numVal > 10000) numVal = 10000;
+    
+    // Update value jika ada perubahan
+    if (numVal !== parseInt(val)) {
+        e.target.value = numVal;
+    }
+    
+    initializeDoctor();
 });
 
 // Initialize on load
